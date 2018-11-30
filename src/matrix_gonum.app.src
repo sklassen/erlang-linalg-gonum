@@ -1,0 +1,13 @@
+{application, matrix_gonum,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { matrix_gonum_app, []}},
+  {env, []}
+ ]}.
+
