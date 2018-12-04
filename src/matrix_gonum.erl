@@ -8,13 +8,13 @@ init() ->
 	ok.
 
 version() -> 
-	rpc({version,[]}).
+	rpc({version,{[]}}).
 
-transpose(_)->
-	not_implemented.
+transpose(X)->
+	rpc({transpose,{X}}).
 
-multiply(_,_)->
-	not_implemented.
+multiply(A,B)->
+	rpc({transpose,{A,B}}).
 
 rpc({Func,Args}) ->
     {gonum,'gonum@localhost'}!{self(),Func,Args},

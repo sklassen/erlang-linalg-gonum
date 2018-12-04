@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/halturin/ergonode"
 	"github.com/halturin/ergonode/etf"
+	"gonum.org/v1/gonum/mat"
 )
 
 // GenServer implementation structure
@@ -60,6 +61,8 @@ func (gs *goGenServ) HandleInfo(message *etf.Term, state interface{}) (code int,
         case etf.Tuple:
             if len(req) == 3 {
                 from:=req[0].(etf.Pid)
+                //fun:=req[1].(etf.Atom)
+                args:=req[2].(etf.Tuple)
                 switch act := req[1].(type) {
                     case etf.Atom:
                         if string(act) == "ping" {
@@ -67,6 +70,19 @@ func (gs *goGenServ) HandleInfo(message *etf.Term, state interface{}) (code int,
                             gs.Send(from, &reply)
                         } else if string(act) == "version" {
                             reply:=etf.Term(etf.Tuple{etf.Atom("ok"),etf.Atom("version")})
+                            gs.Send(from, &reply)
+                        } else if string(act) == "transpose" {
+							a := etf2mat(args[0].(etf.List))
+							fmt.Printf("HandleInfo: %#v\n", a.T())
+                            reply:=etf.Term(etf.Tuple{etf.Atom("ok"),mat2etf(a.T())})
+                            gs.Send(from, &reply)
+                        } else if string(act) == "multiply" {
+							//var c mat.Matrix
+							a := etf2mat(args[0].(etf.List))
+							//b := etf2mat(args[1].(etf.List))
+							//c.Mul(a, a)
+							//fmt.Printf("HandleInfo: %#v\n", c)
+                            reply:=etf.Term(etf.Tuple{etf.Atom("ok"),mat2etf(a)})
                             gs.Send(from, &reply)
                         } else {
                             reply:=etf.Term(etf.Tuple{etf.Atom("error"),etf.Atom("unknown")})
@@ -86,7 +102,43 @@ func (gs *goGenServ) HandleInfo(message *etf.Term, state interface{}) (code int,
     return
 }
 
+// Convert between erlang and gonum
+
+func etf2mat (matrix etf.List) (mat.Matrix) {
+	fmt.Printf("HandleInfo: %#v\n",matrix)
+	nr:=len(matrix)
+	nc:=len(matrix)
+	data:=make([]float64,0)
+	for i,vector:= range matrix {
+		fmt.Printf("HandleInfo: %d,%#v\n",i,vector)
+		nc=len(vector.(etf.List))
+		for j,elem:= range vector.(etf.List) {
+			fmt.Printf("HandleInfo: %d,%#v\n",j,elem)
+			data=append(data,elem.(float64))
+		}
+	}
+	fmt.Printf("HandleInfo: %d,%d\n",nr,nc)
+	m := mat.NewDense(nr, nc, data)
+	return m
+}
+
+func mat2etf(x mat.Matrix) (etf.List) {
+	fmt.Printf("HandleInfo: %#v\n",x)
+	nr,nc:=x.Dims()
+	l:=etf.List{}
+	for r:=0;r<nr;r++ {
+		v:=etf.List{}
+		for c:=0;c<nc;c++ {
+			v=append(v,x.At(r,c))
+		}
+		l=append(l,v)
+	}
+    fmt.Printf("HandleInfo: %#v\n", l)
+	return l
+}
+
 // Terminate called when process died
+
 func (gs *goGenServ) Terminate(reason int, state interface{}) {
 	fmt.Printf("Terminate: %#v\n", reason)
 }
