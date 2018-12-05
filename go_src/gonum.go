@@ -61,28 +61,27 @@ func (gs *goGenServ) HandleInfo(message *etf.Term, state interface{}) (code int,
         case etf.Tuple:
             if len(req) == 3 {
                 from:=req[0].(etf.Pid)
-                //fun:=req[1].(etf.Atom)
-                args:=req[2].(etf.Tuple)
-                switch act := req[1].(type) {
+                switch fun := req[1].(type) {
                     case etf.Atom:
-                        if string(act) == "ping" {
+                        args:=req[2].(etf.Tuple)
+                        if string(fun) == "ping" {
                             reply:=etf.Term(etf.Tuple{etf.Atom("ok"),etf.Atom("pong")})
                             gs.Send(from, &reply)
-                        } else if string(act) == "version" {
+                        } else if string(fun) == "version" {
                             reply:=etf.Term(etf.Tuple{etf.Atom("ok"),etf.Atom("version")})
                             gs.Send(from, &reply)
-                        } else if string(act) == "transpose" {
+                        } else if string(fun) == "transpose" {
 							a := etf2mat(args[0].(etf.List))
 							fmt.Printf("HandleInfo: %#v\n", a.T())
                             reply:=etf.Term(etf.Tuple{etf.Atom("ok"),mat2etf(a.T())})
                             gs.Send(from, &reply)
-                        } else if string(act) == "multiply" {
-							//var c mat.Matrix
+                        } else if string(fun) == "multiply" {
+							var c mat.Dense
 							a := etf2mat(args[0].(etf.List))
-							//b := etf2mat(args[1].(etf.List))
-							//c.Mul(a, a)
-							//fmt.Printf("HandleInfo: %#v\n", c)
-                            reply:=etf.Term(etf.Tuple{etf.Atom("ok"),mat2etf(a)})
+							b := etf2mat(args[1].(etf.List))
+							c.Mul(a, b)
+							fmt.Printf("HandleInfo mul: %#v\n", c)
+                            reply:=etf.Term(etf.Tuple{etf.Atom("ok"),mat2etf(&c)})
                             gs.Send(from, &reply)
                         } else {
                             reply:=etf.Term(etf.Tuple{etf.Atom("error"),etf.Atom("unknown")})
@@ -103,7 +102,6 @@ func (gs *goGenServ) HandleInfo(message *etf.Term, state interface{}) (code int,
 }
 
 // Convert between erlang and gonum
-
 func etf2mat (matrix etf.List) (mat.Matrix) {
 	fmt.Printf("HandleInfo: %#v\n",matrix)
 	nr:=len(matrix)

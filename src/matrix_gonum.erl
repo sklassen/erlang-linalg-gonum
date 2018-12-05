@@ -14,7 +14,7 @@ transpose(X)->
 	rpc({transpose,{X}}).
 
 multiply(A,B)->
-	rpc({transpose,{A,B}}).
+	rpc({multiply,{A,B}}).
 
 rpc({Func,Args}) ->
     {gonum,'gonum@localhost'}!{self(),Func,Args},
