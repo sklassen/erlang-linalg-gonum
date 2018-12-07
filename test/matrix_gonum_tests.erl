@@ -1,6 +1,12 @@
 -module(matrix_gonum_tests). 
 -import(matrix_gonum,[transpose/1,multiply/2]).
 -include_lib("eunit/include/eunit.hrl").
+-on_load(init/0).
+
+init() ->
+	erlang:set_cookie(node(), "monster"),
+	ok.
+
 
 transpose_0_test() ->
 	?assert(transpose([[]])==[[]]).
