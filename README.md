@@ -1,10 +1,14 @@
+# Installation
 
 > go get -u gonum.org/v1/gonum/mat
-
-
 > go get github.com/halturin/ergonode
 
+You need to make sure that the erlang port manager is running.
+
+> epdm
+
 > go run go_src/gonum.go
+> go build go_src/gonum.go
 
 > rebar compile
 
