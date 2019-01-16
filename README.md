@@ -3,6 +3,10 @@
 > go get -u gonum.org/v1/gonum/mat
 > go get github.com/halturin/ergonode
 
+You need to make sure that the erlang port manager is running.
+
+> epdm
+
 # Build go
 
 Unfortunately rebar does not build go progams
