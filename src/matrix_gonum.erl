@@ -8,7 +8,7 @@
 
 init() ->
     erlang:set_cookie(node(), 'monster'),
-	ok.
+    ok.
 
 version() -> 
 	rpc({version,{[]}}).
@@ -24,5 +24,5 @@ rpc({Func,Args}) ->
     receive
          {ok, Reply} -> Reply
     after
-        5000 -> timeout
+        2500 -> timeout
     end.
